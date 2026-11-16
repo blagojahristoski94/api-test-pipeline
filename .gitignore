@@ -1,0 +1,24 @@
+# Dependency directories
+node_modules/
+/playwright/.cache/
+
+# Reports
+out/reports/*.html
+out/reports/*.xsd
+
+# Optional eslint cache
+.eslintcache
+
+# dotenv environment variables file
+.env
+.env_local
+
+# All needed Data json
+/data/*.json
+
+
+# Package lock files
+package-lock.json
+
+# Local secrets file (uploaded to GitHub with scripts/sync-secrets.sh)
+secrets.env

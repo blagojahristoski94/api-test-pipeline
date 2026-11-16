@@ -1,0 +1,110 @@
+name: API Tests
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to run against (uses that GitHub Environment''s secrets)'
+        type: choice
+        options:
+          - qa
+          - bsport
+        default: qa
+      tags:
+        description: 'Optional Cucumber tag expression (e.g. "@smoke" or "not @skip"). Leave empty to run everything.'
+        required: false
+        default: ''
+
+concurrency:
+  group: api-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  api-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    # Manual runs pick the environment; PRs and pushes to main default to qa
+    environment: ${{ inputs.environment || 'qa' }}
+
+    # Config comes from the environment's secrets (falling back to repository secrets) as plain
+    # environment variables (no .env file). Real env vars take precedence over dotenv, which also
+    # lets USER override the runner's own $USER.
+    env:
+      API_BASE_URL: ${{ secrets.API_BASE_URL }}
+      API_KEY: ${{ secrets.API_KEY }}
+      BONUS_AMOUNT: ${{ secrets.BONUS_AMOUNT }}
+      BOOKING_CODE_LENGTH: ${{ secrets.BOOKING_CODE_LENGTH }}
+      EXTERNAL_USER_ID: ${{ secrets.EXTERNAL_USER_ID }}
+      FE_URL: ${{ secrets.FE_URL }}
+      PAM_API_KEY: ${{ secrets.PAM_API_KEY }}
+      PAM_URL: ${{ secrets.PAM_URL }}
+      TOKEN: ${{ secrets.TOKEN }}
+      WS_CODE: ${{ secrets.WS_CODE }}
+      WS_URL: ${{ secrets.WS_URL }}
+      USER: ${{ secrets.USER }}
+      PASSWORD: ${{ secrets.PASSWORD }}
+      AGENT_TOKEN: ${{ secrets.AGENT_TOKEN }}
+      AGENT_EXTERNAL_USER_ID: ${{ secrets.AGENT_EXTERNAL_USER_ID }}
+      # Optional, only needed by the bonus scenarios
+      BONUS_INSTANCE_ID: ${{ secrets.BONUS_INSTANCE_ID }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          # package-lock.json is gitignored in this repo, so key the cache on package.json
+          cache-dependency-path: package.json
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Check required secrets
+        run: |
+          missing=0
+          for name in API_BASE_URL API_KEY BONUS_AMOUNT BOOKING_CODE_LENGTH EXTERNAL_USER_ID FE_URL \
+                      PAM_API_KEY PAM_URL TOKEN WS_CODE WS_URL USER PASSWORD AGENT_TOKEN AGENT_EXTERNAL_USER_ID; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Secret $name is not set"
+              missing=1
+            fi
+          done
+          exit $missing
+
+      - name: Prepare data directory
+        # Tests write runtime data (highlights, betslip IDs, ...) to data/*.json, which is gitignored
+        run: mkdir -p data out/reports
+
+      - name: Run tests
+        env:
+          TAGS: ${{ inputs.tags }}
+        run: |
+          if [ -n "$TAGS" ]; then
+            npm test -- --tags "$TAGS"
+          else
+            npm test
+          fi
+
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cucumber-reports-${{ inputs.environment || 'qa' }}
+          path: out/reports/
+          if-no-files-found: warn
+          retention-days: 14

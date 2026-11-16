@@ -1,0 +1,47 @@
+{
+  "name": "apitesting",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "cucumber-js",
+    "test:report": "start \"\" \"out\\reports\\cucumber-report.html\"",
+    "test:debug": "cucumber-js --format progress",
+    "test:dev": "npx cucumber-js --tags \"@dev\"",
+    "prepare": "husky install",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
+    "format": "prettier --write \"**/*.{ts,tsx,feature}\"",
+    "snippets": "cucumber-js --dry-run --format snippets"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@cucumber/cucumber": "^11.0.1",
+    "@playwright/test": "^1.47.2",
+    "@types/node": "^22.5.5",
+    "@types/pako": "^2.0.3",
+    "@types/ws": "^8.5.13",
+    "@typescript-eslint/eslint-plugin": "^8.7.0",
+    "@typescript-eslint/parser": "^8.7.0",
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.3.1",
+    "eslint": "^9.11.1",
+    "eslint-plugin-playwright": "^0.15.3",
+    "eslint-plugin-prettier": "^5.0.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.3.0",
+    "prettier": "3.3.3",
+    "prettier-plugin-gherkin": "^2.0.0"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "pako": "^2.1.0",
+    "ts-node": "^10.9.2",
+    "ws": "^8.18.0"
+  },
+  "lint-staged": {
+    "*.ts": "eslint --fix"
+  }
+}
