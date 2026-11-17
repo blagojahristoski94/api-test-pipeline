@@ -19,26 +19,28 @@ export function readDataFromFile(filePath: string): any {
 }
 
 
+/** Returns the URL from an env var with exactly one trailing "/", so callers can append paths directly. */
+export function urlFromEnv(name: 'API_BASE_URL' | 'WS_URL' | 'PAM_URL'): string {
+  const value = process.env[name];
+  if (!value) {
+    throw new Error(`Environment variable ${name} is not set`);
+  }
+  return value.endsWith('/') ? value : `${value}/`;
+}
+
 export function baseUrl() {
-  const apiUrl = process.env.API_BASE_URL as string;
-  const baseUrl = `${apiUrl}rest`;
-  return baseUrl;
+  return `${urlFromEnv('API_BASE_URL')}rest`;
 }
 
 export function token() {
-  const filePath = path.join(__dirname, '../../../data/token.json');
-  const tokenFromJson = readDataFromFile(filePath);
-  const tokenEnv = process.env.TOKEN as string;
-  const token = tokenEnv ? tokenEnv : tokenFromJson;
-  return token;
+  // Env wins; only touch token.json when it is needed (it does not exist on a fresh CI runner).
+  if (process.env.TOKEN) return process.env.TOKEN;
+  return readDataFromFile(path.join(__dirname, '../../../data/token.json'));
 }
 
 export function externalUserID() {
-  const filePath = path.join(__dirname, '../../../data/token.json');
-  const userIDFromJson = readDataFromFile(filePath);
-  const userIDEnv = process.env.EXTERNAL_USER_ID as string;
-  const userID = userIDEnv ? userIDEnv : userIDFromJson;
-  return userID;
+  if (process.env.EXTERNAL_USER_ID) return process.env.EXTERNAL_USER_ID;
+  return readDataFromFile(path.join(__dirname, '../../../data/token.json'));
 }
 
 export function apiKey() {

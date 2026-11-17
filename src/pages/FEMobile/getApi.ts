@@ -162,9 +162,7 @@ export default class getApiFEMobile {
   }
 
   async userProfile(iCustomWorld: ICustomWorld) {
-    const apiUrl = process.env.API_BASE_URL as string;
-
-    const fullEndpoint = `${apiUrl}rest/FEMobile/GetUserProfile?ExternalUserID=${externalUserID()}&Token=${token()}&Culture=en`;
+    const fullEndpoint = `${baseUrl()}/FEMobile/GetUserProfile?ExternalUserID=${externalUserID()}&Token=${token()}&Culture=en`;
     const apiContext = await apiContextFor(iCustomWorld);
     const responseBody = await apiContext.get(fullEndpoint, {
       headers: {

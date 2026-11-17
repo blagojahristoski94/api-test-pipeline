@@ -3,6 +3,7 @@ import WebSocket from 'ws';
 import {
   externalUserID,
   token,
+  urlFromEnv,
 } from '../../support/utils/utilityFunctions';
 
 export const openNotificationHub = async (
@@ -21,7 +22,7 @@ export const openNotificationHub = async (
   });
 
   const socket = new WebSocket(
-    `${process.env.WS_URL}signalr/notificationHub`,
+    `${urlFromEnv('WS_URL')}signalr/notificationHub`,
     {
       headers: {
         token: token(),

@@ -2,6 +2,7 @@ import WebSocket from 'ws';
 import pako from 'pako';
 import * as fs from 'fs';
 import path from 'path';
+import { urlFromEnv } from '../../support/utils/utilityFunctions';
 
 const generateLiveMatchesCSV = async (): Promise<void> => {
   const filepath = path.resolve(__dirname, '../../../data/liveMatches.json');
@@ -10,7 +11,7 @@ const generateLiveMatchesCSV = async (): Promise<void> => {
   const getMatchIds = (matches: any[]) => matches.map((match) => match);
 
   const ws = new WebSocket(
-    `${process.env.WS_URL}signalr/liveHubCompressed`,
+    `${urlFromEnv('WS_URL')}signalr/liveHubCompressed`,
     {
       headers: {
         Origin: process.env.FE_URL,

@@ -4,13 +4,14 @@ import path from 'path';
 import {
   externalUserID,
   token,
+  urlFromEnv,
 } from '../../support/utils/utilityFunctions';
 
 const generateCashout = async (): Promise<void> => {
   const filepath = path.resolve(__dirname, '../../../data/cashout.json');
   const TIMEOUT_MS = 1000;
 
-  const ws = new WebSocket(`${process.env.WS_URL}signalr/cashoutHub`, {
+  const ws = new WebSocket(`${urlFromEnv('WS_URL')}signalr/cashoutHub`, {
     headers: {
       token: token(),
       externalUserID: externalUserID(),

@@ -1,7 +1,7 @@
 import { ICustomWorld } from '../../world';
 import * as dotenv from 'dotenv';
 import { apiContextFor } from '../../support/utils/apiClient';
-import { readDataFromFile, writeDataToFile } from '../../support/utils/utilityFunctions';
+import { readDataFromFile, urlFromEnv, writeDataToFile } from '../../support/utils/utilityFunctions';
 import * as fs from 'fs';
 
 dotenv.config();
@@ -12,8 +12,7 @@ interface UserIDs {
 export default class postApiPAM {
 
   async login(iCustomWorld: ICustomWorld) {
-    const baseUrl = process.env.PAM_URL;
-    const apiUrl = `${baseUrl}Services/GamingPortalService.svc/CustomerLoginAccountV2`;
+    const apiUrl = `${urlFromEnv('PAM_URL')}Services/GamingPortalService.svc/CustomerLoginAccountV2`;
     const apiContext = await apiContextFor(iCustomWorld);
 
     const username = process.env.USER as string;

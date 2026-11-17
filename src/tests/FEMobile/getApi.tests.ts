@@ -2,18 +2,17 @@ import { ICustomWorld, sports } from './../../world';
 import { DataTable, Given, Then, When } from '@cucumber/cucumber';
 import { expect } from '@playwright/test';
 import { apiContextFor } from '../../support/utils/apiClient';
-import { approximatelyEqual, externalUserID, readDataFromFile } from '../../support/utils/utilityFunctions';
+import { approximatelyEqual, baseUrl, externalUserID, readDataFromFile } from '../../support/utils/utilityFunctions';
 import path from 'path';
 
 When('I make a GET request to fetch All Settings on {string}', async function (this: ICustomWorld, device: 'web' | 'mobile') {
-  const apiUrl = process.env.API_BASE_URL as string;
   let fullEndpoint;
   switch (device) {
     case 'web':
-      fullEndpoint = `${apiUrl}rest/FEWHome/AllSettings`;
+      fullEndpoint = `${baseUrl()}/FEWHome/AllSettings`;
       break;
     case 'mobile':
-      fullEndpoint = `${apiUrl}rest/FEMobile/GetAllSettings`;
+      fullEndpoint = `${baseUrl()}/FEMobile/GetAllSettings`;
       break;
   }
 
